@@ -43,8 +43,23 @@ app.get('/api/products', (req, res, next) => {
 });
 
 //implement the delete api for deleting a product by Id
-app.delete('/api/products/:id', (req, res) => {
-    
+app.delete('/api/products/:id', (req, res, next) => {
+    try {
+        const productId = parseInt(req.params.id, 10);
+        if (isNaN(productId)) {
+            throw { status: StatusCodes.BAD_REQUEST, message: `Invalid product ID: ${productId}` };
+        }
+
+        const index = products.findIndex(product => product.id === productId);
+        if (index === -1) {
+            throw { status: StatusCodes.NOT_FOUND, message: `Product with ID ${productId} not found` };
+        }
+
+        products.splice(index, 1);
+        res.status(StatusCodes.OK).json({ message: `Product with ${productId} deleted successfully` });
+    } catch (error) {
+        next(error);
+    }
 });
 
 app.use(errorHandler);

@@ -23,7 +23,14 @@ const ProductList = () => {
   }, []);
 
   //implement the delete function
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
+    try {
+      await apiClient.delete(`/api/products/${id}`);
+      setProducts(products.filter(product => product.id !== id));
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      setError(error.response?.data?.message || 'Failed to delete data');
+    }
   };
 
   return (
